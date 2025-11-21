@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Ultimate Live Equation Solver (Portable)</title>
+<style>
+body {
+    background: #111;
+    color: #fff;
+    font-family: Consolas, monospace;
+    text-align: center;
+    padding-top: 50px;
+}
+
+input {
+    padding: 12px;
+    font-size: 18px;
+    width: 280px;
+    border-radius: 8px;
+    border: none;
+}
+
+button {
+    padding: 12px 22px;
+    font-size: 18px;
+    background: #4caf50;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+#loading {
+    display: none;
+    margin-top: 25px;
+    font-size: 20px;
+    opacity: 0.9;
+}
+
+#loadingText {
+    margin-top: 8px;
+    font-size: 18px;
+    color: #aaa;
+}
+
+#complex {
+    margin-top: 25px;
+    font-size: 20px;
+    color: #4da6ff;
+    white-space: pre-wrap;
+    text-align: left;
+    display: inline-block;
+}
+
+#steps {
+    margin-top: 20px;
+    color: #ffd700;
+    text-align: left;
+    white-space: pre-wrap;
+    display: inline-block;
+}
+
+#answer {
+    margin-top: 25px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #76ff76;
+}
+</style>
+</head>
+<body>
+
+<h1>Ultimate Live Equation Solver</h1>
+
+<input id="eqInput" type="text" placeholder="Enter simple equation">
+<button onclick="startProcess()">Solve</button>
+
+<div id="loading">
+    Processing<span id="dots">...</span>
+    <p id="loadingText"></p>
+</div>
+
+<p id="complex"></p>
+<p id="steps"></p>
+<p id="answer"></p>
+
+<script>
+const loadingMessages = [
+    "Expanding logarithmic identities...",
+    "Applying unnecessary trig transformations...",
+    "Adding redundant parentheses...",
+    "Checking if sin²θ + cos²θ still equals 1...",
+    "Converting angles to radians...",
+    "Performing meaningless factorization...",
+    "Injecting algebraic noise...",
+    "Stabilizing math matrix...",
+    "Simulating AI thought process...",
+    "Balancing imaginary components..."
+];
+
+function startProcess() {
+    const eq = document.getElementById("eqInput").value.trim();
+    const resultBox = document.getElementById("answer");
+    const complexBox = document.getElementById("complex");
+    const stepsBox = document.getElementById("steps");
+    const loading = document.getElementById("loading");
+    const loadingText = document.getElementById("loadingText");
+
+    resultBox.innerText = "";
+    complexBox.innerText = "";
+    stepsBox.innerText = "";
+
+    if (!eq.match(/^[0-9+\-*/().\s]+$/)) {
+        complexBox.innerText = "Please enter a simple numeric equation only.";
+        return;
+    }
+
+    let realAnswer;
+    try {
+        realAnswer = eval(eq);
+    } catch {
+        complexBox.innerText = "Invalid equation.";
+        return;
+    }
+
+    // --- Loading stage ---
+    loading.style.display = "block";
+
+    loadingText.innerText = randomMessage();
+    const msgInterval = setInterval(() => { loadingText.innerText = randomMessage(); }, 900);
+
+    let dots = document.getElementById("dots");
+    let dotCount = 0;
+    const dotInterval = setInterval(() => {
+        dotCount = (dotCount + 1) % 4;
+        dots.innerText = ".".repeat(dotCount);
+    }, 300);
+
+    const delay = 5000 + Math.random() * 5000; // 5–10 sec
+    setTimeout(() => {
+        clearInterval(msgInterval);
+        clearInterval(dotInterval);
+        loading.style.display = "none";
+
+        const complicated = generateSuperComplicated(eq);
+        revealEquation(complicated, stepsBox, realAnswer);
+
+    }, delay);
+}
+
+function randomMessage() {
+    return loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
+}
+
+// --- Complicated generator ---
+function generateSuperComplicated(eq) {
+    let base = "(" + eq.replace(/([\+\-\*\/])/g, ") $1 (") + ")";
+
+    const noise = [
+        "+ sin(0)", "+ tan(0)", "+ cos(Math.PI/2)",
+        "+ (sin(Math.PI/4)**2 + cos(Math.PI/4)**2 - 1)",
+        "* 1", "+ (log(10)/log(10) - 1)", "+ (Math.E - Math.E)",
+        "+ (sqrt(16) - 4)", "+ (3*5 - 15)", "* (cos(0) + sin(0))",
+        "+ (tan(0)/tan(0) - 1)", "+ ((sin(x)**2 + cos(x)**2) - 1)".replace("x", randomTrigAngle()),
+        "+ (Math.pow(2,3) - 8)", "+ (Math.sqrt(49) - 7)", "+ (100/25 - 4)",
+        "* (sin(0) + 1)", "+ ((a+b)*(a-b) - (a^2-b^2))".replace("a",Math.floor(Math.random()*5+1)).replace("b",Math.floor(Math.random()*5+1))
+    ];
+
+    let out = base;
+    const count = 15 + Math.floor(Math.random()*15);
+    for(let i=0;i<count;i++){
+        out += " " + noise[Math.floor(Math.random()*noise.length)];
+    }
+    return out;
+}
+
+function randomTrigAngle() {
+    const angles = ["0", "Math.PI/6", "Math.PI/4", "Math.PI/3", "Math.PI/2", "Math.PI"];
+    return angles[Math.floor(Math.random()*angles.length)];
+}
+
+// --- Live reveal ---
+function revealEquation(complicated, stepsBox, answer) {
+    let index = 0;
+    const revealInterval = setInterval(() => {
+        stepsBox.innerText += complicated.charAt(index);
+        index++;
+        if(index >= complicated.length){
+            clearInterval(revealInterval);
+            // Fake simplification steps
+            simulateSteps(stepsBox, answer);
+        }
+    }, 20);
+}
+
+// --- Simulate step-by-step simplification ---
+function simulateSteps(stepsBox, answer){
+    const fakeSteps = [
+        "Combining like terms...",
+        "Applying trig identities...",
+        "Eliminating zeros and ones...",
+        "Rearranging factors...",
+        "Final simplifications..."
+    ];
+    let i = 0;
+    const stepInterval = setInterval(()=>{
+        if(i<fakeSteps.length){
+            stepsBox.innerText += "\n" + fakeSteps[i];
+            i++;
+        }else{
+            clearInterval(stepInterval);
+            document.getElementById("answer").innerText = "Final Answer: " + answer;
+        }
+    }, 800);
+}
+</script>
+
+</body>
+</html>
